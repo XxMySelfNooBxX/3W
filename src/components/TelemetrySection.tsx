@@ -1,5 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
+import { SplitText } from "gsap/SplitText";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import TerminalFeed from "./TerminalFeed";
 
 const nodes = [
@@ -13,35 +17,76 @@ const statusColor = (s: string) =>
   s === "ACTIVE" ? "text-[var(--color-accent-green)]" : "text-yellow-400";
 
 export default function TelemetrySection() {
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    gsap.registerPlugin(SplitText, ScrollTrigger);
+
+    // Headline words slide in from the right side — like sonar data pinging in
+    const splitHeadline = SplitText.create(headlineRef.current!, {
+      type: "words,lines",
+      linesClass: "overflow-hidden pb-[0.05em]",
+    });
+
+    ScrollTrigger.create({
+      trigger: headlineRef.current,
+      start: "top 82%",
+      onEnter: () => {
+        gsap.fromTo(
+          splitHeadline.words,
+          { x: 80, opacity: 0, skewX: -8 },
+          {
+            x: 0,
+            opacity: 1,
+            skewX: 0,
+            stagger: 0.06,
+            duration: 0.8,
+            ease: "power3.out",
+            onComplete: () => splitHeadline.revert(),
+          }
+        );
+      },
+      once: true,
+    });
+  }, []);
+
   return (
     <section className="min-h-screen flex flex-col justify-center px-[10vw] relative z-10 py-24">
       <div className="w-full flex flex-col gap-16">
 
         {/* Header */}
-        <div className="gsap-reveal">
+        <div>
           <p className="font-mono text-[var(--color-accent-cyan)] uppercase tracking-[0.3em] text-xs mb-4">
             Depth: 3,000m — Bathyal Telemetry Grid
           </p>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
-            <h2 className="text-[clamp(2.5rem,6vw,5rem)] font-serif leading-tight">
+            <h2
+              ref={headlineRef}
+              className="text-[clamp(2.5rem,6vw,5rem)] font-serif leading-tight"
+            >
               Deep-Water<br />Telemetry
             </h2>
-            <p className="text-white/55 text-base max-w-md leading-relaxed font-sans">
+            <p className="text-white/55 text-base max-w-md leading-relaxed font-sans gsap-reveal">
               Traditional RF signals fail below 20m. Bathyal uses a mesh of acoustic modems to relay carbon density readings from the edge — in real time.
             </p>
           </div>
         </div>
 
         {/* Two Column Layout */}
-        <div className="flex flex-col lg:flex-row gap-8 gsap-reveal">
+        <div className="flex flex-col lg:flex-row gap-8">
 
-          {/* LEFT: Node Status Grid */}
+          {/* LEFT: Node Status Grid — cards slide in like sonar pings */}
           <div className="flex-1 flex flex-col gap-4">
-            <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest mb-2">
+            <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest mb-2 gsap-reveal">
               ◉ Live Sensor Network — 4 Active Nodes
             </p>
             {nodes.map((node, i) => (
-              <div key={i} className="glass rounded-xl p-4 grid grid-cols-4 gap-4 items-center group hover:bg-white/[0.06] transition-colors duration-300">
+              <div
+                key={i}
+                className="telemetry-node-card glass rounded-xl p-4 grid grid-cols-4 gap-4 items-center group hover:bg-white/[0.06] transition-colors duration-300"
+                style={{ opacity: 0 }} // hidden until GSAP reveal from page.tsx
+              >
                 <div>
                   <p className="font-mono text-[var(--color-accent-cyan)] text-sm font-bold">{node.id}</p>
                   <p className={`font-mono text-[10px] uppercase tracking-widest mt-1 ${statusColor(node.status)}`}>
@@ -73,13 +118,12 @@ export default function TelemetrySection() {
           </div>
 
           {/* RIGHT: Terminal Feed */}
-          <div className="w-full lg:w-[380px] flex flex-col gap-4 flex-shrink-0">
+          <div className="w-full lg:w-[380px] flex flex-col gap-4 flex-shrink-0 gsap-reveal">
             <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest mb-2">
               ◉ Encrypted Telemetry Stream
             </p>
             <TerminalFeed />
 
-            {/* Pressure Gauge */}
             <div className="glass rounded-xl p-5">
               <div className="flex justify-between items-center mb-3">
                 <p className="font-mono text-[10px] text-white/40 uppercase tracking-widest">Pressure</p>

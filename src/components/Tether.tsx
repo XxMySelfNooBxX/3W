@@ -6,24 +6,29 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 export default function Tether() {
   useEffect(() => {
-    // Only run on client
+    let ctx: gsap.Context;
     if (typeof window !== "undefined") {
       gsap.registerPlugin(ScrollTrigger);
       
-      gsap.fromTo(".tether-fill",
-        { height: "0%" },
-        {
-          height: "100%",
-          ease: "none",
-          scrollTrigger: {
-            trigger: "body",
-            start: "top top",
-            end: "bottom bottom",
-            scrub: true
+      ctx = gsap.context(() => {
+        gsap.fromTo(".tether-fill",
+          { height: "0%" },
+          {
+            height: "100%",
+            ease: "none",
+            scrollTrigger: {
+              trigger: "body",
+              start: "top top",
+              end: "bottom bottom",
+              scrub: true
+            }
           }
-        }
-      );
+        );
+      });
     }
+    return () => {
+      if (ctx) ctx.revert();
+    };
   }, []);
 
   return (
