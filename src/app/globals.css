@@ -17,11 +17,14 @@
 }
 
 body {
-  background-color: var(--color-surface);
-  color: var(--foreground);
-  font-family: var(--font-serif);
+  background-color: transparent;
+  color: var(--color-text);
   overflow-x: hidden;
-  transition: background-color 1.2s ease;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 2px var(--color-accent-cyan);
+  color: transparent;
 }
 
 /* ========================

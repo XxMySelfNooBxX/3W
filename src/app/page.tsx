@@ -39,37 +39,47 @@ export default function Home() {
   const [zoneIndex, setZoneIndex] = useState(0);
 
   useEffect(() => {
-    // ── Background color transitions (scrubbed with scroll) ──
-    gsap.to("body", {
-      backgroundColor: COLORS.twilight,
-      ease: "none",
+    // ── Transition 1: Surface to Twilight (500m) ──
+    const tlTwilight = gsap.timeline({
       scrollTrigger: {
-        trigger: "#zone-twilight",
-        start: "top bottom",
-        end: "top center",
+        trigger: "#waypoint-twilight",
+        start: "top 80%",
+        end: "bottom top",
         scrub: true,
       },
     });
-    gsap.to("body", {
-      backgroundColor: COLORS.bathyal,
-      ease: "none",
+    tlTwilight
+      .to("#bg-twilight", { clipPath: "circle(150% at 50% 50%)", ease: "none", duration: 1 }, 0)
+      .to("#text-twilight", { opacity: 1, scale: 1, ease: "power2.out", duration: 0.3 }, 0)
+      .to("#text-twilight", { scale: 20, opacity: 0, ease: "power2.in", duration: 0.7 }, 0.3);
+
+    // ── Transition 2: Twilight to Bathyal (1500m) ──
+    const tlBathyal = gsap.timeline({
       scrollTrigger: {
-        trigger: "#zone-bathyal",
-        start: "top bottom",
-        end: "top center",
+        trigger: "#waypoint-bathyal",
+        start: "top 80%",
+        end: "bottom top",
         scrub: true,
       },
     });
-    gsap.to("body", {
-      backgroundColor: COLORS.abyss,
-      ease: "none",
+    tlBathyal
+      .to("#bg-bathyal", { clipPath: "circle(150% at 50% 50%)", ease: "none", duration: 1 }, 0)
+      .to("#text-bathyal", { opacity: 1, scale: 1, ease: "power2.out", duration: 0.3 }, 0)
+      .to("#text-bathyal", { scale: 20, opacity: 0, ease: "power2.in", duration: 0.7 }, 0.3);
+
+    // ── Transition 3: Bathyal to Abyss (3500m) ──
+    const tlAbyss = gsap.timeline({
       scrollTrigger: {
-        trigger: "#zone-abyss",
-        start: "top bottom",
-        end: "top center",
+        trigger: "#waypoint-abyss",
+        start: "top 80%",
+        end: "bottom top",
         scrub: true,
       },
     });
+    tlAbyss
+      .to("#bg-abyss", { clipPath: "circle(150% at 50% 50%)", ease: "none", duration: 1 }, 0)
+      .to("#text-abyss", { opacity: 1, scale: 1, ease: "power2.out", duration: 0.3 }, 0)
+      .to("#text-abyss", { scale: 20, opacity: 0, ease: "power2.in", duration: 0.7 }, 0.3);
 
     // ── Track zone transitions for HUD ──
     ScrollTrigger.create({
@@ -148,6 +158,21 @@ export default function Home() {
   return (
     <main ref={containerRef} className="relative w-full">
 
+      {/* ── Fixed Background Wipes (z-[-1]) ── */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none">
+        <div className="absolute inset-0 bg-[#1E90FF]" id="bg-surface" />
+        <div className="absolute inset-0 bg-[#4B0082]" id="bg-twilight" style={{ clipPath: "circle(0% at 50% 50%)" }} />
+        <div className="absolute inset-0 bg-[#120524]" id="bg-bathyal" style={{ clipPath: "circle(0% at 50% 50%)" }} />
+        <div className="absolute inset-0 bg-[#0a0a0f]" id="bg-abyss" style={{ clipPath: "circle(0% at 50% 50%)" }} />
+      </div>
+
+      {/* ── Cinematic Typography (z-10) ── */}
+      <div className="fixed inset-0 z-10 pointer-events-none flex items-center justify-center overflow-hidden">
+        <h1 id="text-twilight" className="text-[25vw] font-black text-stroke opacity-0 scale-50 absolute">500M</h1>
+        <h1 id="text-bathyal" className="text-[25vw] font-black text-stroke opacity-0 scale-50 absolute">1500M</h1>
+        <h1 id="text-abyss" className="text-[25vw] font-black text-stroke opacity-0 scale-50 absolute">3500M</h1>
+      </div>
+
       {/* ── Fixed 3D Canvas Background ── */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <Canvas camera={{ position: [0, 0, 12], fov: 55 }}>
@@ -201,7 +226,7 @@ export default function Home() {
         <HeroSection />
       </div>
 
-      <div className="min-h-[60vh] flex items-center py-12 snap-target">
+      <div className="min-h-[60vh] flex items-center py-12 snap-target" id="waypoint-twilight">
         <Waypoint
           depth="500"
           title="The Twilight Zone"
@@ -213,7 +238,7 @@ export default function Home() {
         <MechanismSection />
       </div>
 
-      <div className="min-h-[60vh] flex items-center py-12 snap-target">
+      <div className="min-h-[60vh] flex items-center py-12 snap-target" id="waypoint-bathyal">
         <Waypoint
           depth="1,500"
           title="The Midnight Zone"
@@ -225,7 +250,7 @@ export default function Home() {
         <TelemetrySection />
       </div>
 
-      <div className="min-h-[60vh] flex items-center py-12 snap-target">
+      <div className="min-h-[60vh] flex items-center py-12 snap-target" id="waypoint-abyss">
         <Waypoint
           depth="3,500"
           title="The Abyssal Plain"

@@ -18,6 +18,7 @@ export default function MarineSnow({ count = 1800, zoneIndex = 0 }) {
   const time = useRef(0);
   const currentSpeedMult = useRef(1);
   const currentOpacity = useRef(0.45);
+  const currentWobbleMult = useRef(1);
 
   const particles = useMemo<ParticleData[]>(() => {
     const temp: ParticleData[] = [];
@@ -64,21 +65,26 @@ export default function MarineSnow({ count = 1800, zoneIndex = 0 }) {
     // Determine target multipliers based on depth zone
     let targetSpeed = 1;
     let targetOpacity = 0.45;
+    let targetWobbleMult = 1;
     
     if (zoneIndex === 1) { // Twilight (Plunge)
       targetSpeed = 1.8;
       targetOpacity = 0.45;
+      targetWobbleMult = 3.0; // High turbulence
     } else if (zoneIndex === 2) { // Midnight (Bioluminescence)
       targetSpeed = 0.6;
       targetOpacity = 0.8; 
+      targetWobbleMult = 0.5; // Calmer
     } else if (zoneIndex === 3) { // Abyss (Suspended)
       targetSpeed = 0.2;
       targetOpacity = 0.2;
+      targetWobbleMult = 0.1; // Almost still
     }
 
     // Smoothly lerp towards targets
     currentSpeedMult.current = THREE.MathUtils.lerp(currentSpeedMult.current, targetSpeed, 0.02);
     currentOpacity.current = THREE.MathUtils.lerp(currentOpacity.current, targetOpacity, 0.02);
+    currentWobbleMult.current = THREE.MathUtils.lerp(currentWobbleMult.current, targetWobbleMult, 0.02);
     
     materialRef.current.opacity = currentOpacity.current;
 
@@ -86,8 +92,9 @@ export default function MarineSnow({ count = 1800, zoneIndex = 0 }) {
       p.y -= (p.baseSpeed * currentSpeedMult.current);
       if (p.y < -30) p.y = 30;
 
-      // Organic horizontal drift using sin wave
-      const drift = Math.sin(time.current * p.wobbleSpeed + p.wobble) * 0.008;
+      // Organic horizontal drift using sin wave with dynamic turbulence
+      p.wobble += (p.wobbleSpeed * currentSpeedMult.current * 0.05);
+      const drift = Math.sin(p.wobble) * (0.008 * currentWobbleMult.current);
       p.x += drift;
 
       dummy.position.set(p.x, p.y, p.z);
