@@ -17,23 +17,114 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--color-surface);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-serif);
   overflow-x: hidden;
+  transition: background-color 1.2s ease;
 }
 
-/* Hide scrollbar for a cleaner premium look while keeping functionality */
-::-webkit-scrollbar {
-  width: 8px;
+/* ========================
+   GLASSMORPHISM UTILITY
+======================== */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+.glass-cyan {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(0, 255, 255, 0.04);
+  border: 1px solid rgba(0, 255, 255, 0.15);
 }
+
+/* ========================
+   KEYFRAMES
+======================== */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,255,255,0.3); }
+  50%       { box-shadow: 0 0 30px rgba(0,255,255,0.8), 0 0 60px rgba(0,255,255,0.3); }
+}
+
+@keyframes pulse-glow-green {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,255,127,0.3); }
+  50%       { box-shadow: 0 0 30px rgba(0,255,127,0.8), 0 0 60px rgba(0,255,127,0.3); }
+}
+
+@keyframes drift-down {
+  0%   { transform: translateY(-8px); opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(100px); opacity: 0; }
+}
+
+@keyframes scan-line {
+  0%   { top: 0%; }
+  100% { top: 100%; }
+}
+
+@keyframes counter-in {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================
+   ANIMATION UTILITIES
+======================== */
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2.5s ease-in-out infinite;
+}
+
+.animate-pulse-glow-green {
+  animation: pulse-glow-green 2.5s ease-in-out infinite;
+}
+
+.animate-drift-down {
+  animation: drift-down 3s ease-in-out infinite;
+}
+
+/* ========================
+   CARBON FLOW PARTICLE
+======================== */
+.carbon-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent-cyan);
+  animation: drift-down 2.5s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--color-accent-cyan);
+}
+
+/* ========================
+   SCROLLBAR STYLING
+======================== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(0, 255, 255, 0.2);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 255, 255, 0.4);
+}
+
+/* ========================
+   SECTION UTILITY
+======================== */
+.zone-section {
+  position: relative;
+  z-index: 10;
 }
