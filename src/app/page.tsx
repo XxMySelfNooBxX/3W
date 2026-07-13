@@ -102,8 +102,8 @@ export default function Home() {
           start: "top top",
           end: "bottom bottom",
           scrub: true,
+          // @ts-ignore: GSAP JS supports string selectors here, but TS definitions are outdated
           snap: {
-            // @ts-ignore: GSAP JS supports string selectors here, but TS definitions are outdated
             snapTo: ".snap-target",
             duration: { min: 0.2, max: 1.0 },
             delay: 0.2,
