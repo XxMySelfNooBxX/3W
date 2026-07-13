@@ -39,31 +39,56 @@ export default function Home() {
   const [zoneIndex, setZoneIndex] = useState(0);
 
   useEffect(() => {
-    // ── Background color transitions (using hex — GSAP can't resolve CSS vars) ──
+    // ── Background color transitions (scrubbed with scroll) ──
+    gsap.to("body", {
+      backgroundColor: COLORS.twilight,
+      ease: "none",
+      scrollTrigger: {
+        trigger: "#zone-twilight",
+        start: "top bottom",
+        end: "top center",
+        scrub: true,
+      },
+    });
+    gsap.to("body", {
+      backgroundColor: COLORS.bathyal,
+      ease: "none",
+      scrollTrigger: {
+        trigger: "#zone-bathyal",
+        start: "top bottom",
+        end: "top center",
+        scrub: true,
+      },
+    });
+    gsap.to("body", {
+      backgroundColor: COLORS.abyss,
+      ease: "none",
+      scrollTrigger: {
+        trigger: "#zone-abyss",
+        start: "top bottom",
+        end: "top center",
+        scrub: true,
+      },
+    });
+
+    // ── Track zone transitions for HUD ──
     ScrollTrigger.create({
       trigger: "#zone-twilight",
       start: "top center",
-      onEnter:    () => gsap.to("body", { backgroundColor: COLORS.twilight, duration: 1.2 }),
-      onLeaveBack:() => gsap.to("body", { backgroundColor: COLORS.surface,  duration: 1.2 }),
+      onEnter: () => setZoneIndex(1),
+      onLeaveBack: () => setZoneIndex(0),
     });
     ScrollTrigger.create({
       trigger: "#zone-bathyal",
       start: "top center",
-      onEnter:    () => { gsap.to("body", { backgroundColor: COLORS.bathyal, duration: 1.2 }); setZoneIndex(2); },
-      onLeaveBack:() => { gsap.to("body", { backgroundColor: COLORS.twilight, duration: 1.2 }); setZoneIndex(1); },
+      onEnter: () => setZoneIndex(2),
+      onLeaveBack: () => setZoneIndex(1),
     });
     ScrollTrigger.create({
       trigger: "#zone-abyss",
       start: "top center",
-      onEnter:    () => { gsap.to("body", { backgroundColor: COLORS.abyss, duration: 1.2 }); setZoneIndex(3); },
-      onLeaveBack:() => { gsap.to("body", { backgroundColor: COLORS.bathyal, duration: 1.2 }); setZoneIndex(2); },
-    });
-    // Track zone transitions for HUD
-    ScrollTrigger.create({
-      trigger: "#zone-twilight",
-      start: "top center",
-      onEnter:    () => setZoneIndex(1),
-      onLeaveBack:() => setZoneIndex(0),
+      onEnter: () => setZoneIndex(3),
+      onLeaveBack: () => setZoneIndex(2),
     });
 
     // ── Depth HUD counter (scrub 0–4000) ──
@@ -77,6 +102,13 @@ export default function Home() {
           start: "top top",
           end: "bottom bottom",
           scrub: true,
+          snap: {
+            // @ts-ignore: GSAP JS supports string selectors here, but TS definitions are outdated
+            snapTo: ".snap-target",
+            duration: { min: 0.2, max: 1.0 },
+            delay: 0.2,
+            ease: "power2.inOut"
+          },
           onUpdate: () => {
             if (hudDepthRef.current) {
               hudDepthRef.current.textContent = `${Math.round(proxy.depth).toLocaleString()}m`;
@@ -121,9 +153,25 @@ export default function Home() {
         <Canvas camera={{ position: [0, 0, 12], fov: 55 }}>
           <fog attach="fog" args={["#0a0a0f", 8, 35]} />
           <ambientLight intensity={0.6} />
-          <MarineSnow count={1800} />
+          <MarineSnow count={1800} zoneIndex={zoneIndex} />
         </Canvas>
       </div>
+
+      {/* ── Visual Overlays ── */}
+      {/* Vignette Overlay (Abyss) */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-40 transition-opacity duration-1000 ease-in-out"
+        style={{ 
+          opacity: zoneIndex === 3 ? 1 : 0,
+          background: "radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.95) 100%)" 
+        }} 
+      />
+      {/* Sonar Ping (Midnight) */}
+      {zoneIndex === 2 && (
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-30">
+          <div className="w-[30vh] h-[30vh] rounded-full border border-[var(--color-accent-cyan)] animate-sonar opacity-0" />
+        </div>
+      )}
 
       {/* ── Fixed Depth HUD (top-right) ── */}
       <div className="fixed top-8 right-8 z-50 flex items-start gap-3 pointer-events-none">
@@ -149,11 +197,11 @@ export default function Home() {
       <Tether />
 
       {/* ── Sections ── */}
-      <div id="zone-surface" className="zone-section">
+      <div id="zone-surface" className="zone-section snap-target">
         <HeroSection />
       </div>
 
-      <div className="min-h-[60vh] flex items-center py-12">
+      <div className="min-h-[60vh] flex items-center py-12 snap-target">
         <Waypoint
           depth="500"
           title="The Twilight Zone"
@@ -161,11 +209,11 @@ export default function Home() {
         />
       </div>
 
-      <div id="zone-twilight" className="zone-section">
+      <div id="zone-twilight" className="zone-section snap-target">
         <MechanismSection />
       </div>
 
-      <div className="min-h-[60vh] flex items-center py-12">
+      <div className="min-h-[60vh] flex items-center py-12 snap-target">
         <Waypoint
           depth="1,500"
           title="The Midnight Zone"
@@ -173,11 +221,11 @@ export default function Home() {
         />
       </div>
 
-      <div id="zone-bathyal" className="zone-section">
+      <div id="zone-bathyal" className="zone-section snap-target">
         <TelemetrySection />
       </div>
 
-      <div className="min-h-[60vh] flex items-center py-12">
+      <div className="min-h-[60vh] flex items-center py-12 snap-target">
         <Waypoint
           depth="3,500"
           title="The Abyssal Plain"
@@ -185,7 +233,7 @@ export default function Home() {
         />
       </div>
 
-      <div id="zone-abyss" className="zone-section pb-20">
+      <div id="zone-abyss" className="zone-section pb-20 snap-target">
         <AbyssSection />
       </div>
     </main>
