@@ -10,6 +10,8 @@ import MechanismSection from "@/components/MechanismSection";
 import TelemetrySection from "@/components/TelemetrySection";
 import AbyssSection from "@/components/AbyssSection";
 import MarineSnow from "@/components/MarineSnow";
+import Tether from "@/components/Tether";
+import Waypoint from "@/components/Waypoint";
 
 // Prevent GSAP issues in SSR
 if (typeof window !== "undefined") {
@@ -79,20 +81,46 @@ export default function Home() {
         </Canvas>
       </div>
 
+      <Tether />
+
       {/* Foreground Sections */}
       <div id="zone-surface" className="zone-section">
         <HeroSection />
       </div>
       
-      <div id="zone-twilight" className="zone-section pt-20">
+      <div className="min-h-[50vh] flex items-center pt-20">
+        <Waypoint 
+          depth="500m" 
+          title="The Twilight Zone" 
+          description="Light penetration < 1%. Photosynthesis ceases here. The biological pump relies entirely on gravity to pull 'marine snow' deeper into the dark."
+        />
+      </div>
+      
+      <div id="zone-twilight" className="zone-section">
         <MechanismSection />
       </div>
       
-      <div id="zone-bathyal" className="zone-section pt-20">
+      <div className="min-h-[50vh] flex items-center pt-20">
+        <Waypoint 
+          depth="1,500m" 
+          title="The Midnight Zone" 
+          description="Temperatures drop to 4°C. High pressure and freezing temperatures. Organic carbon reaching this depth is effectively locked away from the atmosphere for centuries."
+        />
+      </div>
+      
+      <div id="zone-bathyal" className="zone-section">
         <TelemetrySection />
       </div>
       
-      <div id="zone-abyss" className="zone-section pt-20">
+      <div className="min-h-[50vh] flex items-center pt-20">
+        <Waypoint 
+          depth="3,500m" 
+          title="Abyssal Plain" 
+          description="Long-Term Storage. Only 0.1% of the carbon produced at the sunlit surface eventually reaches the seafloor to be buried for geological timescales."
+        />
+      </div>
+      
+      <div id="zone-abyss" className="zone-section pb-20">
         <AbyssSection />
       </div>
     </main>

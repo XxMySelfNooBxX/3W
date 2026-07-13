@@ -11,7 +11,7 @@ const generateLog = (index: number) => {
 
 export default function TerminalFeed() {
   const [logs, setLogs] = useState<string[]>([]);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initial logs
@@ -30,8 +30,8 @@ export default function TerminalFeed() {
   }, []);
 
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
     }
   }, [logs]);
 
@@ -43,13 +43,12 @@ export default function TerminalFeed() {
         <div className="w-3 h-3 rounded-full bg-green-500"></div>
         <span className="ml-2 text-gray-400 uppercase tracking-widest text-[10px]">Deep-Water Telemetry</span>
       </div>
-      <div className="flex-1 overflow-y-auto pr-2 flex flex-col gap-2">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto pr-2 flex flex-col gap-2 scroll-smooth custom-scrollbar">
         {logs.map((log, i) => (
           <div key={i} className="text-[var(--color-accent-cyan)] opacity-90 leading-relaxed">
             <span className="text-gray-500 mr-2">{'>'}</span>{log}
           </div>
         ))}
-        <div ref={bottomRef} />
       </div>
     </div>
   );
